@@ -1,0 +1,17 @@
+{
+  "name": "tgrm",
+  "version": "0.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsup"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@grammyjs/types": "^3.3.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  }
+}
