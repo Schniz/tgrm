@@ -52,7 +52,7 @@ export async function request<Method extends keyof Methods>(
         "Content-Type": "application/json",
       }),
     },
-    body: JSON.stringify(params),
+    body: params instanceof FormData ? params : JSON.stringify(params),
   });
 
   if (!response.ok) {
