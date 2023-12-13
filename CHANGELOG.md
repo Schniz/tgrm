@@ -1,5 +1,11 @@
 # tgrm
 
+## 0.0.1-next.1
+
+### Patch Changes
+
+- [`de0176c`](https://github.com/Schniz/tgrm/commit/de0176c987716623757aadd231752ff218505783) Thanks [@Schniz](https://github.com/Schniz)! - maybe fix form data
+
 ## 0.0.1-next.0
 
 ### Patch Changes
