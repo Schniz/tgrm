@@ -1,12 +1,27 @@
-import { Methods, MethodParameters, MethodReturn } from "./types";
+import {
+  Methods,
+  MethodParameters,
+  MethodReturn,
+  FormDataParameters,
+} from "./types";
 
+/**
+ * Thrown when the Telegram API responds with an error.
+ */
 class TelegramError extends Error {
   name = "TelegramError";
 
   constructor(
+    /** The method that was called. */
     readonly method: string,
+    /** The parameters that were passed to the method. */
     readonly parameters: unknown,
+    /**
+     * The response from the Telegram API.
+     * Its body is already consumed and available in {@link TelegramError.responseText}
+     */
     readonly response: Response,
+    /** The response text from the Telegram API. */
     readonly responseText: string
   ) {
     super(
@@ -19,15 +34,20 @@ export type ClientResult<Method extends keyof Methods> =
   | { ok: false }
   | { ok: true; result: MethodReturn<Method> };
 
-export async function requestJson<Method extends keyof Methods>(
+/**
+ * Make a request to the Telegram API.
+ */
+export async function request<Method extends keyof Methods>(
   { baseUrl, fetch: providedFetch = fetch }: TelegramClientOptions,
   method: Method,
-  params: MethodParameters<Method>
+  params: MethodParameters<Method> | FormData
 ): Promise<ClientResult<Method>> {
   const response = await providedFetch(`${baseUrl}/${method}`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...(!(params instanceof FormData) && {
+        "Content-Type": "application/json",
+      }),
     },
     body: JSON.stringify(params),
   });
@@ -46,51 +66,71 @@ export async function requestJson<Method extends keyof Methods>(
   >;
 }
 
-export async function requestFormData<Method extends keyof Methods>(
-  { baseUrl, fetch: providedFetch = fetch }: TelegramClientOptions,
-  method: Method,
-  formData: FormData
-): Promise<ClientResult<Method>> {
-  const response = await providedFetch(`${baseUrl}/${method}`, {
-    method: "POST",
-    body: formData,
-  });
+/**
+ * A function that makes a request to the Telegram API.
+ */
+export type TelegramRequestFn = <K extends keyof Methods>(
+  k: K,
+  params: MethodParameters<K> | FormData
+) => Promise<{ ok: false } | { ok: true; result: ReturnType<Methods[K]> }>;
 
-  if (!response.ok) {
-    throw new TelegramError(
-      method,
-      formData,
-      response,
-      await response.text().catch(() => "Unknown error")
-    );
-  }
-
-  return response.json() as Promise<
-    { ok: false } | { ok: true; result: MethodReturn<Method> }
-  >;
+/**
+ * A Telegram client.
+ */
+export interface Client {
+  request: TelegramRequestFn;
 }
 
-export type TelegramRequestJsonFunction = <K extends keyof Methods>(
-  k: K,
-  params: Parameters<Methods[K]>[0]
-) => Promise<{ ok: false } | { ok: true; result: ReturnType<Methods[K]> }>;
+type TokenOrBaseUrl =
+  | { token?: never; baseUrl: string | URL }
+  | { token: string; baseUrl?: never };
 
-export type TelegramRequestFormDataFunction = <K extends keyof Methods>(
-  k: K,
-  fd: FormData
-) => Promise<{ ok: false } | { ok: true; result: ReturnType<Methods[K]> }>;
+export type UserTelegramClientOptions = Omit<TelegramClientOptions, "baseUrl"> &
+  TokenOrBaseUrl;
 
-export interface Client {
-  requestJson: TelegramRequestJsonFunction;
-  requestFormData: TelegramRequestFormDataFunction;
+/**
+ * Normalizes {@link UserTelegramClientOptions} to {@link TelegramClientOptions}
+ * so the client can be created.
+ */
+export function normalizeOptions(
+  options: UserTelegramClientOptions
+): TelegramClientOptions {
+  const baseUrl = options.baseUrl
+    ? String(options.baseUrl)
+    : `https://api.telegram.org/bot${options.token}`;
+  return {
+    ...options,
+    baseUrl,
+  };
 }
 
 export interface TelegramClientOptions {
   readonly baseUrl: string;
+  /** A custom fetch function. Defaults to the global `fetch`. */
   readonly fetch?: typeof fetch;
 }
 
-export const createClient = (options: TelegramClientOptions): Client => ({
-  requestJson: (k, params) => requestJson(options, k, params),
-  requestFormData: (k, fd) => requestFormData(options, k, fd),
-});
+export const createClient = (
+  userOptions: UserTelegramClientOptions
+): Client => {
+  const options = normalizeOptions(userOptions);
+  return {
+    request: (k, params) => request(options, k, params),
+  };
+};
+
+export function buildFormDataFor<M extends keyof Methods>(
+  params: FormDataParameters<M>
+): FormData {
+  const fd = new FormData();
+
+  for (const [key, value] of Object.entries(params as object)) {
+    if (value && value instanceof File) {
+      fd.append(key, value, value.name);
+    } else {
+      fd.append(key, value as any);
+    }
+  }
+
+  return fd;
+}
