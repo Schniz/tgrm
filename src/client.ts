@@ -30,6 +30,9 @@ class TelegramError extends Error {
   }
 }
 
+/**
+ * A result of the `client.request` function
+ */
 export type ClientResult<Method extends keyof Methods> =
   | { ok: false }
   | { ok: true; result: MethodReturn<Method> };
@@ -38,7 +41,7 @@ export type ClientResult<Method extends keyof Methods> =
  * Make a request to the Telegram API.
  */
 export async function request<Method extends keyof Methods>(
-  { baseUrl, fetch: providedFetch = fetch }: TelegramClientOptions,
+  { baseUrl, fetch: providedFetch = fetch }: ResolvedTelegramClientOptions,
   method: Method,
   params: MethodParameters<Method> | FormData
 ): Promise<ClientResult<Method>> {
@@ -61,9 +64,7 @@ export async function request<Method extends keyof Methods>(
     );
   }
 
-  return response.json() as Promise<
-    { ok: false } | { ok: true; result: MethodReturn<Method> }
-  >;
+  return response.json() as Promise<ClientResult<Method>>;
 }
 
 /**
@@ -74,9 +75,7 @@ export type TelegramRequestFn = <K extends keyof Methods>(
   params: MethodParameters<K> | FormData
 ) => Promise<{ ok: false } | { ok: true; result: ReturnType<Methods[K]> }>;
 
-/**
- * A Telegram client.
- */
+/** A Telegram client. */
 export interface Client {
   request: TelegramRequestFn;
 }
@@ -85,16 +84,23 @@ type TokenOrBaseUrl =
   | { token?: never; baseUrl: string | URL }
   | { token: string; baseUrl?: never };
 
-export type UserTelegramClientOptions = Omit<TelegramClientOptions, "baseUrl"> &
+/**
+ * Options for the Telegram client.
+ * Either a token or a base URL must be provided.
+ */
+export type TelegramClientOptions = Omit<
+  ResolvedTelegramClientOptions,
+  "baseUrl"
+> &
   TokenOrBaseUrl;
 
 /**
- * Normalizes {@link UserTelegramClientOptions} to {@link TelegramClientOptions}
+ * Normalizes {@link TelegramClientOptions} to {@link ResolvedTelegramClientOptions}
  * so the client can be created.
  */
 export function normalizeOptions(
-  options: UserTelegramClientOptions
-): TelegramClientOptions {
+  options: TelegramClientOptions
+): ResolvedTelegramClientOptions {
   const baseUrl = options.baseUrl
     ? String(options.baseUrl)
     : `https://api.telegram.org/bot${options.token}`;
@@ -104,21 +110,29 @@ export function normalizeOptions(
   };
 }
 
-export interface TelegramClientOptions {
+/**
+ * Options for the Telegram client.
+ */
+export interface ResolvedTelegramClientOptions {
+  /** The base URL of the Telegram API. Contains the token. */
   readonly baseUrl: string;
   /** A custom fetch function. Defaults to the global `fetch`. */
   readonly fetch?: typeof fetch;
 }
 
-export const createClient = (
-  userOptions: UserTelegramClientOptions
-): Client => {
+/**
+ * Create a Telegram client
+ */
+export const createClient = (userOptions: TelegramClientOptions): Client => {
   const options = normalizeOptions(userOptions);
   return {
     request: (k, params) => request(options, k, params),
   };
 };
 
+/**
+ * Build a FormData object based on the given key of {@link Methods}
+ */
 export function buildFormDataFor<M extends keyof Methods>(
   params: FormDataParameters<M>
 ): FormData {
