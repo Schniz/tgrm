@@ -6,7 +6,9 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "changeset:version": "changeset version && pnpm install --no-frozen-lockfile",
+    "changeset:publish": "pnpm run build && changeset publish"
   },
   "keywords": [],
   "author": "",
