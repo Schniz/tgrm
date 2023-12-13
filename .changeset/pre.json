@@ -4,5 +4,8 @@
   "initialVersions": {
     "tgrm": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "dry-pears-share",
+    "odd-maps-enjoy"
+  ]
 }
