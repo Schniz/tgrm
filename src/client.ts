@@ -3,6 +3,7 @@ import {
   MethodParameters,
   MethodReturn,
   FormDataParameters,
+  Method,
 } from "./types";
 
 /**
@@ -131,7 +132,21 @@ export const createClient = (userOptions: TelegramClientOptions): Client => {
 };
 
 /**
- * Build a FormData object based on the given key of {@link Methods}
+ * Build a FormData object based on the given a {@link Method}
+ *
+ * This allows you to have autocomplete and type-checking
+ * when using the `client.request` function,
+ * while still being able to upload files to the Telegram API.
+ *
+ * @example
+ * ```typescript
+ * const params = buildFormDataFor<"sendDocument">({
+ *   chat_id: 123,
+ *   document: new File(["hello"], "hello.txt")
+ * });
+ *
+ * const response = await client.request("sendDocument", params);
+ * ```
  */
 export function buildFormDataFor<M extends keyof Methods>(
   params: FormDataParameters<M>
