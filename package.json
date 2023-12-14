@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "vercel-build": "typedoc src/index.ts --out public",
     "changeset:version": "changeset version && pnpm install --no-frozen-lockfile",
     "changeset:publish": "pnpm run build && changeset publish"
   },
