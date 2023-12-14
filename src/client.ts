@@ -142,7 +142,7 @@ export function buildFormDataFor<M extends keyof Methods>(
     if (value && value instanceof File) {
       fd.append(key, value, value.name);
     } else {
-      fd.append(key, value as any);
+      fd.append(key, typeof value === "string" ? value : JSON.stringify(value));
     }
   }
 
