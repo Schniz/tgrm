@@ -2,6 +2,10 @@
 
 A minimal Telegram Bot API client
 
+[Read the docs](https://tgrm.oss.hagever.com)
+
+## Usage
+
 ```typescript
 import { createClient, buildFormDataFor } from "tgrm";
 
