@@ -1,5 +1,13 @@
 # tgrm
 
+## 0.0.2
+
+### Patch Changes
+
+- [#6](https://github.com/Schniz/tgrm/pull/6) [`0357aad`](https://github.com/Schniz/tgrm/commit/0357aad2d5a2dbf5f2eb5c939fabeb3ab6c997b4) Thanks [@Schniz](https://github.com/Schniz)! - JSON.stringify all fields of the FormData that aren't a string or a file
+
+- [#7](https://github.com/Schniz/tgrm/pull/7) [`8c1d69f`](https://github.com/Schniz/tgrm/commit/8c1d69fadd6540302af97459f4e1ebb057a9feba) Thanks [@Schniz](https://github.com/Schniz)! - add more docs
+
 ## 0.0.1
 
 ### Patch Changes
