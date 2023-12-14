@@ -13,7 +13,20 @@ export type TgrmFileId = typeof TgrmFileId;
 export type Methods = ApiMethods<TgrmFileId>;
 
 /**
+ * A name of a method in the Telegram API
+ *
+ * @example "sendMessage"
+ * @example "sendDocument"
+ */
+export type Method = keyof Methods;
+
+/**
  * The parameters of a given method from {@link Methods}
+ *
+ * @example
+ * ```typescript
+ * const params: MethodParameters<"sendMessage"> = { chat_id: 123, text: "Hello" };
+ * ```
  */
 export type MethodParameters<K extends keyof Methods> = Parameters<
   Methods[K]
