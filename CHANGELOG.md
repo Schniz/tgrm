@@ -1,5 +1,11 @@
 # tgrm
 
+## 0.0.3
+
+### Patch Changes
+
+- [#9](https://github.com/Schniz/tgrm/pull/9) [`787af9c`](https://github.com/Schniz/tgrm/commit/787af9c64084311089c76a08e1ed8c1824a3acbd) Thanks [@Schniz](https://github.com/Schniz)! - add buildMessage function
+
 ## 0.0.2
 
 ### Patch Changes
