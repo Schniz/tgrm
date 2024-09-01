@@ -1,5 +1,13 @@
 # tgrm
 
+## 0.0.4
+
+### Patch Changes
+
+- [#11](https://github.com/Schniz/tgrm/pull/11) [`2654f0a`](https://github.com/Schniz/tgrm/commit/2654f0a69225cb8cf3a7e6c7980436108101fb46) Thanks [@Schniz](https://github.com/Schniz)! - expose grammyjs types to consume directly
+
+- [#13](https://github.com/Schniz/tgrm/pull/13) [`7be02e6`](https://github.com/Schniz/tgrm/commit/7be02e64178e781537060f42f03499fa1a258dd4) Thanks [@Schniz](https://github.com/Schniz)! - upgrade @grammyjs/types
+
 ## 0.0.3
 
 ### Patch Changes
